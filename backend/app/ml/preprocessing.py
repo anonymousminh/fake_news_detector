@@ -1,5 +1,6 @@
 import re
 import nltk
+from nltk.stem import PorterStemmer, WordNetLemmatizer
 
 nltk.download('punkt_tab')
 nltk.download('stopwords')
@@ -58,9 +59,23 @@ def tokenize_and_remove_stopwords(text: str) -> list:
     
     return filtered_tokens
 
+def process_tokens(tokens, use_stemming=False, use_lemmatization=True):
+    """
+    Process tokens with stemming or lemmatization.
+    """
+    if use_stemming:
+        stemmer = PorterStemmer()
+        processed_tokens = [stemmer.stem(token) for token in tokens]
+    elif use_lemmatization:
+        lemmatizer = WordNetLemmatizer()
+        processed_tokens = [lemmatizer.lemmatize(token) for token in tokens]
+    else:
+        processed_tokens = tokens
+    
+    return processed_tokens
 
 # Test your function
-sample_text = "This is a sample text with some common stopwords that should be removed."
-tokens = tokenize_and_remove_stopwords(sample_text)
-print(f"Original: {sample_text}")
-print(f"Tokens without stopwords: {tokens}")
+tokens = ["running", "jumps", "better", "studies", "studying", "cats", "dogs"]
+print(f"Original tokens: {tokens}")
+print(f"Stemmed tokens: {process_tokens(tokens, use_stemming=True, use_lemmatization=False)}")
+print(f"Lemmatized tokens: {process_tokens(tokens, use_stemming=False, use_lemmatization=True)}")
