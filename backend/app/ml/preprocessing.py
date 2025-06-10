@@ -1,10 +1,12 @@
 import re
 import nltk
 from nltk.stem import PorterStemmer, WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 
-nltk.download('punkt_tab')
-nltk.download('stopwords')
-nltk.download('wordnet')
+# nltk.download('punkt_tab')
+# nltk.download('stopwords')
+# nltk.download('wordnet')
 
 def clean_text(text: str) -> str:
     """
@@ -41,10 +43,7 @@ def tokenize_and_remove_stopwords(text: str) -> list:
         
     Returns:
         list: A list of tokens with stopwords removed.
-    """
-    from nltk.tokenize import word_tokenize
-    from nltk.corpus import stopwords
-    
+    """   
     # Clean the text first
     text = clean_text(text)
 
@@ -59,6 +58,29 @@ def tokenize_and_remove_stopwords(text: str) -> list:
     
     return filtered_tokens
     
+
+def process_tokens(tokens: list, use_stemming: bool, use_lemmatization: bool) -> list:
+    """
+    Apply stemming or lemmatization to tokens.
+    
+    Args:
+        tokens (list): List of tokens.
+        use_stemming (bool): Whether to apply stemming.
+        use_lemmatization (bool): Whether to apply lemmatization.
+        
+    Returns:
+        list: List of processed tokens.
+    """
+    if use_stemming:
+        ps = PorterStemmer()
+        tokens = [ps.stem(token) for token in tokens]
+    
+    if use_lemmatization:
+        lemmatizer = WordNetLemmatizer()
+        tokens = [lemmatizer.lemmatize(token) for token in tokens]
+    
+    return tokens
+
 
 def preprocess_text(text, remove_stopwords=True, use_stemming=False, use_lemmatization=True):
     """
@@ -75,8 +97,8 @@ def preprocess_text(text, remove_stopwords=True, use_stemming=False, use_lemmati
         stop_words = set(stopwords.words('english'))
         tokens = [token for token in tokens if token not in stop_words]
     
-    # Apply stemming or lemmatization
-    tokens = preprocess_tokens(tokens, use_stemming, use_lemmatization)
+    # Apply stemming or lemmatization using the helper function
+    tokens = process_tokens(tokens, use_stemming, use_lemmatization)
 
     # Join tokens back into text
     processed_text = ' '.join(tokens)
