@@ -3,10 +3,12 @@ import nltk
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 # nltk.download('punkt_tab')
 # nltk.download('stopwords')
 # nltk.download('wordnet')
+
 
 def clean_text(text: str) -> str:
     """
@@ -105,8 +107,40 @@ def preprocess_text(text, remove_stopwords=True, use_stemming=False, use_lemmati
     
     return processed_text
 
+def vectorize_texts(texts, max_features=5000):
+    """
+    Convert a list of texts into a TF-IDF features.
+    
+    Args:
+        texts (list): List of texts to vectorize.
+        max_features (int): Maximum number of features to extract.
+        
+    Returns:
+        TfidfVectorizer: Fitted vectorizer.
+        array: Transformed text data.
+    """
+    vectorizer = TfidfVectorizer(max_features=max_features, min_df=2, max_df=0.85)
+
+    # Fit and transform the texts
+    X = vectorizer.fit_transform(texts)
+
+    return X, vectorizer
+
 # Test your function
-sample_text = "The runner was running faster than all the other runners in the race!"
-processed = preprocess_text(sample_text)
-print(f"Original: {sample_text}")
-print(f"Processed: {processed}")
+texts = [
+    "This is a sample document about cats and dogs.",
+    "Another document discussing dogs and pets.",
+    "A third document about politics and economics.",
+    "Yet another document about pets and animals."
+]
+
+# Preprocess each text
+preprocessed_texts = [preprocess_text(text) for text in texts]
+print("Preprocessed texts:")
+for text in preprocessed_texts:
+    print(f"- {text}")
+
+# Vectorize
+X, vectorizer = vectorize_texts(preprocessed_texts)
+print(f"\nFeature matrix shape: {X.shape}")
+print(f"Feature names (first 10): {vectorizer.get_feature_names_out()[:10]}")
